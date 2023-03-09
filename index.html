@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkpoint - 01</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header>
+        <h1>Primeiro Checkpoint</h1>
+        <h2>FRONT-END II</h2>
+    </header>
+    <div class="container">
+        <form class="formulario">
+            <legend>Criação de personagem</legend>
+            <div>
+                <label for="titulo"></label>
+                <input type="text" name="titulo" id="titulo" placeholder="Titulo" autocomplete="none" required>
+            </div>
+            <div>
+                <label for="url"></label>
+                <input type="url" name="url" id="url" placeholder="Url" autocomplete="none" required>
+            </div>
+            <div>
+                <label for="descricao"></label>
+                <textarea name="descricao" id="descricao" cols="30" rows="10" placeholder="Descrição"
+                    required></textarea>
+            </div>
+            <button>Cadastrar</button>
+        </form>
+        <div class="cardContainer">
+            <h1>
+                Personagens Criados
+            </h1>
+        </div>
+    </div>
+</body>
+<script src="./index.js"></script>
+</html>
