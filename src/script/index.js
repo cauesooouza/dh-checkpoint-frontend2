@@ -36,8 +36,9 @@ const createCard = (container, data) => {
     })
 }
 
-const cleanForm = () => {
-    formElement.reset();
+const showError = (error = '') => {
+    errorElement.style.display = 'block'
+    errorElement.innerText = error
 
     setTimeout(() => {
         errorElement.innerText = '';
@@ -53,18 +54,52 @@ const verifyData = (title, url, description) => {
     return (DATA.some(data => data.title === title || data.url === url || data.description === description));
 }
 
+const toLocalStorage = () => {
+    let objetString = JSON.stringify(storageCard(tituloInput.value.toUpperCase(), urlInput.value, descricaoInput.value));
+    localStorage.setItem(tituloInput.value.toUpperCase(), objetString)
+}
+
+const getLocalStorage = () => {
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+
+        try {
+            const object = JSON.parse(value);
+            DATA.push(object);
+            DATA.sort((a, b) => {
+                if (a.title < b.title) {
+                    return -1
+                } else if (a.title == b.title) {
+                    return 0
+                } else {
+                    return 1
+                }
+            })
+
+            createCard(containerCards, DATA)
+
+
+        } catch (e) {
+            console.error(e)
+        }
+    }
+}
+
 const handleSubmit = (event) => {
     event.preventDefault();
 
     if (tituloInput.value.length < 4) {
-        errorElement.style.display = 'block';
-        errorElement.innerText = 'O titulo não pode ser menor que 4 caracteres'
-        cleanForm();
+        showError(tituloInput,'O titulo não pode ser menor que 4 caracteres');
+        tituloInput.value = '';
 
     } else if (verifyData(tituloInput.value, urlInput.value, descricaoInput.value)) {
-        errorElement.style.display = 'block';
-        errorElement.innerText = 'Card não pode ser repetido';
-        cleanForm();
+        showError('Card não pode ser repetido');
+        formElement.reset();
+
+    } else if (!/(?=.)png|jpeg|jpg|gif/.test(urlInput.value)) {
+        showError('url deve ser um link terminado em formato de imagem (.png|jpeg|gif)');
+        urlInput.value = '';
 
     } else {
         DATA.push(storageCard(tituloInput.value, urlInput.value, descricaoInput.value))
@@ -78,49 +113,26 @@ const handleSubmit = (event) => {
                 return 1
         })
 
-
-        let objetString = JSON.stringify(storageCard(tituloInput.value, urlInput.value, descricaoInput.value));
-        localStorage.setItem(tituloInput.value.toUpperCase(), objetString)
-        cleanForm();
+        toLocalStorage()
+        formElement.reset();
     }
 
     headerContainerCards.style.display = 'flex';
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // Itera por todas as chaves do Local Storage
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const value = localStorage.getItem(key);
-
-        // Verifica se o valor é um objeto
-        try {
-            const object = JSON.parse(value);
-            DATA.push(object);
-            DATA.sort((a, b) => {
-                if (a.title < b.title)
-                    return -1
-                else if (a.title == b.title)
-                    return 0
-                else
-                    return 1
-            })
-
-            createCard(containerCards, DATA)
-
-
-        } catch (e) {
-            // O valor não é um objeto, então ignora
-        }
-    }
-
-    DATA == 0 ? headerContainerCards.style.display = 'none' : 'block';
-    formElement.addEventListener('submit', handleSubmit)
-})
 
 const removeSavedCards = (e) => {
     let item = e.parentNode.parentNode.querySelector('.title').innerHTML.trim()
     localStorage.removeItem(`${item}`)
     window.location.reload();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    getLocalStorage()
+    if (DATA == 0) {
+        headerContainerCards.style.display = 'none'
+    } else {
+        headerContainerCards.style.display = 'block'
+    }
+
+    formElement.addEventListener('submit', handleSubmit)
+})
