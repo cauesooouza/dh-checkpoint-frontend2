@@ -69,7 +69,14 @@ const handleSubmit = (event) => {
     } else {
         DATA.push(storageCard(tituloInput.value, urlInput.value, descricaoInput.value))
         createCard(containerCards, DATA)
-        DATA.sort( (a,b) => a.title < b.title ? -1 : 1)
+        DATA.sort((a, b) => {
+            if (a.title < b.title)
+                return -1
+            else if (a.title == b.title)
+                return 0
+            else
+                return 1
+        })
 
 
         let objetString = JSON.stringify(storageCard(tituloInput.value, urlInput.value, descricaoInput.value));
@@ -91,7 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const object = JSON.parse(value);
             DATA.push(object);
-            DATA.sort( (a,b) => a.title < b.title ? -1 : 1)
+            DATA.sort((a, b) => {
+                if (a.title < b.title)
+                    return -1
+                else if (a.title == b.title)
+                    return 0
+                else
+                    return 1
+            })
 
             createCard(containerCards, DATA)
 
