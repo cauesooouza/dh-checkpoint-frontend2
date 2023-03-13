@@ -25,7 +25,7 @@ const createCard = (container, data) => {
                 </div>
                     <div class="cardBody">
                         <span class="title">
-                            ${element.title}
+                            ${element.title.toUpperCase()}
                         </span>
                         <p>
                             ${element.description}
@@ -56,7 +56,7 @@ const verifyData = (title, url, description) => {
 const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (tituloInput.value.length <= 4) {
+    if (tituloInput.value.length < 4) {
         errorElement.style.display = 'block';
         errorElement.innerText = 'O titulo não pode ser menor que 4 caracteres'
         cleanForm();
@@ -69,10 +69,11 @@ const handleSubmit = (event) => {
     } else {
         DATA.push(storageCard(tituloInput.value, urlInput.value, descricaoInput.value))
         createCard(containerCards, DATA)
+        DATA.sort( (a,b) => a.title < b.title ? -1 : 1)
 
 
         let objetString = JSON.stringify(storageCard(tituloInput.value, urlInput.value, descricaoInput.value));
-        localStorage.setItem('card_' + (DATA.length - 1), objetString)
+        localStorage.setItem(tituloInput.value.toUpperCase(), objetString)
         cleanForm();
     }
 
@@ -90,6 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const object = JSON.parse(value);
             DATA.push(object);
+            DATA.sort( (a,b) => a.title < b.title ? -1 : 1)
+
             createCard(containerCards, DATA)
 
 
@@ -103,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 const removeSavedCards = (e) => {
-    let item = e.parentNode.parentNode.id
-    localStorage.removeItem(`card_${item}`)
-    window.location.reload()
+    let item = e.parentNode.parentNode.querySelector('.title').innerHTML.trim()
+    localStorage.removeItem(`${item}`)
+    window.location.reload();
 }
