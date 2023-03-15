@@ -1,5 +1,5 @@
 const DATA = [];
-const [tituloInput, urlInput] = document.querySelectorAll('input');
+const [tituloInput, urlInput, submitInput] = document.querySelectorAll('input');
 const descricaoInput = document.querySelector('textarea')
 const headerContainerCards = document.getElementById('headerContainerCards')
 const formElement = document.getElementById('cadastro')
@@ -25,7 +25,7 @@ const createCard = (container, data) => {
                 </div>
                     <div class="cardBody">
                         <span class="title">
-                            ${element.title.toUpperCase()}
+                            ${element.title}
                         </span>
                         <p>
                             ${element.description}
@@ -47,7 +47,11 @@ const showError = (error = '') => {
 }
 
 const storageCard = (titulo, url, descricao) => {
-    return { title: titulo, url: url, description: descricao }
+    return {
+        title: titulo,
+        url: url,
+        description: descricao
+    }
 }
 
 const verifyData = (title, url, description) => {
@@ -55,8 +59,8 @@ const verifyData = (title, url, description) => {
 }
 
 const toLocalStorage = () => {
-    let objetString = JSON.stringify(storageCard(tituloInput.value.toUpperCase(), urlInput.value, descricaoInput.value));
-    localStorage.setItem(tituloInput.value.toUpperCase(), objetString)
+    let objetString = JSON.stringify(storageCard(tituloInput.value, urlInput.value, descricaoInput.value));
+    localStorage.setItem(tituloInput.value, objetString)
 }
 
 const getLocalStorage = () => {
@@ -78,44 +82,34 @@ const getLocalStorage = () => {
             })
 
             createCard(containerCards, DATA)
-
-
         } catch (e) {
-            console.error(e)
+            console.error(e);
         }
     }
 }
 
+
+
 const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (tituloInput.value.length < 4) {
-        showError(tituloInput,'O titulo não pode ser menor que 4 caracteres');
-        tituloInput.value = '';
-
-    } else if (verifyData(tituloInput.value, urlInput.value, descricaoInput.value)) {
+    if (verifyData(tituloInput.value, urlInput.value, descricaoInput.value)) {
         showError('Card não pode ser repetido');
         formElement.reset();
+    } 
+    DATA.push(storageCard(tituloInput.value, urlInput.value, descricaoInput.value))
+    createCard(containerCards, DATA)
+    DATA.sort((a, b) => {
+        if (a.title < b.title)
+            return -1
+        else if (a.title == b.title)
+            return 0
+        else
+            return 1
+    })
 
-    } else if (!/(?=.)png|jpeg|jpg|gif/.test(urlInput.value)) {
-        showError('url deve ser um link terminado em formato de imagem (.png|jpeg|gif)');
-        urlInput.value = '';
-
-    } else {
-        DATA.push(storageCard(tituloInput.value, urlInput.value, descricaoInput.value))
-        createCard(containerCards, DATA)
-        DATA.sort((a, b) => {
-            if (a.title < b.title)
-                return -1
-            else if (a.title == b.title)
-                return 0
-            else
-                return 1
-        })
-
-        toLocalStorage()
-        formElement.reset();
-    }
+    toLocalStorage()
+    formElement.reset();
 
     headerContainerCards.style.display = 'flex';
 }
@@ -125,6 +119,22 @@ const removeSavedCards = (e) => {
     localStorage.removeItem(`${item}`)
     window.location.reload();
 }
+
+descricaoInput.addEventListener('focusout', ()=> {
+    if (tituloInput.value.length < 4) {
+        showError('O titulo não pode ser menor que 4 caracteres');
+
+    } else if (!/(?=.)png|jpeg|jpg|gif/.test(urlInput.value)) {
+        showError('A url deve ser um link terminado em formato de imagem (.png | .jpeg | .gif)');
+   
+    } else if (descricaoInput.value < 4) {
+        showError('A descrição não pode ser menor que 4 caracteres');
+    
+    } else {
+        submitInput.disabled = false
+    }
+})
+
 
 document.addEventListener('DOMContentLoaded', () => {
     getLocalStorage()
